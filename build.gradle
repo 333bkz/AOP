@@ -1,0 +1,62 @@
+import org.aspectj.bridge.IMessage
+import org.aspectj.bridge.MessageHandler
+import org.aspectj.tools.ajc.Main
+
+buildscript {
+    
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.2.1'
+    }
+    dependencies {
+        classpath 'org.aspectj:aspectjtools:1.9.1'
+        classpath 'org.aspectj:aspectjweaver:1.9.1'
+        classpath 'com.android.tools.build:gradle:3.2.1'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+def ajc(String androidbootClassFiles, JavaCompile javaCompile) {
+    def log = project.logger
+    log.error "Aspectj切片开始编织Class!"
+    String[] args = ["-showWeaveInfo",
+                     "-1.8",
+                     "-inpath", javaCompile.destinationDir.toString(),
+                     "-aspectpath", javaCompile.classpath.asPath,
+                     "-d", javaCompile.destinationDir.toString(),
+                     "-classpath", javaCompile.classpath.asPath,
+                     "-bootclasspath", androidbootClassFiles]
+    log.error args.toString()
+    MessageHandler handler = new MessageHandler(true);
+    new Main().run(args, handler)
+    for (IMessage message : handler.getMessages(null, true)) {
+        switch (message.getKind()) {
+            case IMessage.ABORT:
+            case IMessage.ERROR:
+            case IMessage.FAIL:
+                log.error message.message, message.thrown
+                throw message.thrown
+                break;
+            case IMessage.WARNING:
+            case IMessage.INFO:
+                log.info message.message, message.thrown
+                break;
+            case IMessage.DEBUG:
+                log.debug message.message, message.thrown
+                break;
+        }
+    }
+}
