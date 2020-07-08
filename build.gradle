@@ -8,13 +8,11 @@ buildscript {
         google()
         jcenter()
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
-    }
+
     dependencies {
         classpath 'org.aspectj:aspectjtools:1.9.1'
         classpath 'org.aspectj:aspectjweaver:1.9.1'
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:4.0.0'
     }
 }
 
